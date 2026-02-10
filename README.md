@@ -29,12 +29,11 @@
 
 ## Fitur Unggulan
 
-- Dasbor modern 100% dark mode + responsif (HP & PC)
+- Dasbor modern & responsif (HP & PC)
 - Support resolusi 360p → 1080p 60FPS (preset siap pakai)
 - Jalan lancar di VPS termurah (1 Core, 1 GB RAM!)
 - Real-time monitoring CPU, RAM, Disk
 - Auto-loop 24/7
-- Activity log + notifikasi error langsung
 - Menggunakan FFmpeg sistem → anti crash & memory leak
 - Support multi-platform: YouTube, Twitch, Facebook, TikTok, Custom RTMP
 
