@@ -1,4 +1,4 @@
-const ffmpeg = require("ffmpeg-static");
+const ffmpeg = "ffmpeg";
 const { spawn } = require("child_process");
 const logger = require("../utils/logger");
 const fs = require("fs");
