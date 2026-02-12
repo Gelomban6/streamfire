@@ -12,29 +12,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    body {
-      font-family: 'Outfit', sans-serif;
-      background-color: #f0f9ff;
-    }
-
-    ::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #fff;
-      border-left: 2px solid #000;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #000;
-      border: 2px solid #fff;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #222;
-    }
+    body { font-family: 'Outfit', sans-serif; background-color: #f0f9ff; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #fff; border-left: 2px solid #000; }
+    ::-webkit-scrollbar-thumb { background: #000; border: 2px solid #fff; }
+    ::-webkit-scrollbar-thumb:hover { background: #222; }
   </style>
 </head>
 
@@ -42,10 +24,9 @@
 
   <%- include('partials/header', { path: '/' }) %>
 
-    <div class="md:ml-64 min-h-screen flex flex-col transition-all duration-300">
-
-      <header
-        class="h-16 border-b-2 border-black bg-white sticky top-0 z-30 flex items-center justify-between px-4 md:px-8">
+  <div class="md:ml-64 min-h-screen flex flex-col transition-all duration-300">
+      
+      <header class="h-16 border-b-2 border-black bg-white sticky top-0 z-30 flex items-center justify-between px-4 md:px-8">
         <div class="flex items-center gap-4">
           <button id="open-sidebar" class="md:hidden text-black hover:text-gray-700 transition-colors">
             <i class="fas fa-bars text-xl"></i>
@@ -55,353 +36,497 @@
           </h1>
         </div>
         <div>
-          <button id="add-video-btn"
+          <button onclick="document.getElementById('uploadModal').classList.remove('hidden')"
             class="bg-cyan-400 text-black border-2 border-black px-4 py-2 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex items-center gap-2">
             <i class="fas fa-plus"></i>
-            <span class="hidden sm:inline">
-              <%= t.new_stream %>
-            </span>
+            <span class="hidden sm:inline"><%= t.new_stream %></span>
           </button>
         </div>
       </header>
 
       <main class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
-
+        
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div
-            class="bg-pink-400 border-2 border-black p-5 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] flex items-center gap-5">
-            <div
-              class="w-12 h-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          
+          <div class="bg-pink-400 border-2 border-black p-5 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] flex items-center gap-5">
+            <div class="w-12 h-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               <i class="fas fa-video text-xl"></i>
             </div>
             <div>
-              <div class="text-black text-xs font-bold uppercase tracking-wider mb-1">
-                <%= t.total_videos %>
-              </div>
-              <div class="text-3xl font-black text-black">
-                <%= videos.length %>
-              </div>
+              <div class="text-black text-xs font-bold uppercase tracking-wider mb-1"><%= t.total_videos %></div>
+              <div class="text-3xl font-black text-black"><%= videos.length %></div>
             </div>
           </div>
 
-          <div
-            class="bg-lime-400 border-2 border-black p-5 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] flex items-center gap-5">
-            <div
-              class="w-12 h-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <div class="bg-lime-400 border-2 border-black p-5 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] flex items-center gap-5">
+            <div class="w-12 h-12 bg-white border-2 border-black flex items-center justify-center text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               <i class="fas fa-signal text-xl"></i>
             </div>
             <div>
-              <div class="text-black text-xs font-bold uppercase tracking-wider mb-1">
-                <%= t.active_streams %>
-              </div>
+              <div class="text-black text-xs font-bold uppercase tracking-wider mb-1"><%= t.active_streams %></div>
               <div class="text-3xl font-black text-black" id="active-count">0</div>
             </div>
           </div>
 
-          <div
-            class="bg-white border-2 border-black p-5 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] flex flex-col justify-center">
+          <div class="bg-white border-2 border-black p-5 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] flex flex-col justify-center">
+            
             <div class="flex justify-between items-end mb-2">
-              <div class="text-black text-xs font-bold uppercase tracking-wider">
-                <%= t.cpu_load %>
-              </div>
+              <div class="text-black text-xs font-bold uppercase tracking-wider"><%= t.cpu_load %></div>
               <div class="text-black text-xs font-mono font-bold" id="cpu-text">0%</div>
             </div>
             <div class="w-full bg-gray-200 border-2 border-black h-4 overflow-hidden">
-              <div class="bg-cyan-400 h-full border-r-2 border-black transition-all duration-500" id="cpu-bar"
-                style="width: 0%"></div>
+              <div class="bg-cyan-400 h-full border-r-2 border-black transition-all duration-500" id="cpu-bar" style="width: 0%"></div>
             </div>
+            
             <div class="flex justify-between items-end mt-3 mb-2">
-              <div class="text-black text-xs font-bold uppercase tracking-wider">
-                <%= t.ram_usage %>
-              </div>
+              <div class="text-black text-xs font-bold uppercase tracking-wider"><%= t.ram_usage %></div>
               <div class="text-black text-xs font-mono font-bold" id="ram-text">0%</div>
             </div>
             <div class="w-full bg-gray-200 border-2 border-black h-4 overflow-hidden">
-              <div class="bg-yellow-400 h-full border-r-2 border-black transition-all duration-500" id="ram-bar"
-                style="width: 0%"></div>
+              <div class="bg-yellow-400 h-full border-r-2 border-black transition-all duration-500" id="ram-bar" style="width: 0%"></div>
             </div>
+
           </div>
         </div>
 
         <% if (videos.length===0) { %>
-          <div
-            class="bg-white border-2 border-black border-dashed p-12 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <div
-              class="w-16 h-16 bg-gray-100 border-2 border-black flex items-center justify-center mx-auto mb-4 text-black">
+          <div class="bg-white border-2 border-black border-dashed p-12 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div class="w-16 h-16 bg-gray-100 border-2 border-black flex items-center justify-center mx-auto mb-4 text-black">
               <i class="fas fa-film text-2xl"></i>
             </div>
-            <h3 class="text-xl font-black text-black mb-2 uppercase">
-              <%= t.no_streams %>
-            </h3>
-            <p class="text-black font-medium text-sm max-w-xs mx-auto mb-6">
-              <%= t.upload_instruction %>
-            </p>
-            <button onclick="document.getElementById('add-video-btn').click()"
+            <h3 class="text-xl font-black text-black mb-2 uppercase"><%= t.no_streams %></h3>
+            <p class="text-black font-medium text-sm max-w-xs mx-auto mb-6"><%= t.upload_instruction %></p>
+            <button onclick="document.getElementById('uploadModal').classList.remove('hidden')"
               class="text-black underline hover:text-pink-500 text-sm font-bold transition-colors">
               <%= t.upload_btn %> &rarr;
             </button>
           </div>
-          <% } else { %>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-              <% videos.forEach((video)=> { %>
-                <div
-                  class="bg-white border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200 flex flex-col"
-                  id="card-<%= video.id %>">
+        <% } else { %>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <% videos.forEach((video)=> { %>
+              
+              <div class="bg-white border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200 flex flex-col" id="card-<%= video.id %>">
+                  
                   <div class="aspect-video bg-black relative overflow-hidden border-b-2 border-black">
-                    <video class="w-full h-full object-cover opacity-80"
-                      poster="<%= video.thumbnail ? '/uploads/thumbnails/' + video.thumbnail : '' %>">
+                    <video class="w-full h-full object-cover opacity-80" poster="<%= video.thumbnail ? '/uploads/thumbnails/' + video.thumbnail : '' %>">
                       <% if (video.filename) { %>
                         <source src="/uploads/<%= video.filename %>" type="video/mp4">
-                        <% } %>
+                      <% } %>
                     </video>
 
                     <div class="absolute top-3 left-3 flex flex-col gap-2">
-                      <div id="badge-<%= video.id %>"
-                        class="bg-black text-[10px] font-bold px-2 py-1 text-white border border-white flex items-center gap-2">
-                        <div class="w-2 h-2 rounded-none bg-red-500" id="dot-<%= video.id %>"></div>
-                        <span id="status-<%= video.id %>">
-                          <%= t.status_offline %>
-                        </span>
-                      </div>
+                        <div class="bg-black text-[10px] font-bold px-2 py-1 text-white border border-white flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-none <%= video.start_time ? 'bg-green-400 animate-ping' : 'bg-red-500' %>" id="dot-<%= video.id %>"></div>
+                            <span id="status-<%= video.id %>" class="<%= video.start_time ? 'text-green-400' : '' %>">
+                                <%= video.start_time ? 'LIVE NOW' : t.status_offline %>
+                            </span>
+                        </div>
                     </div>
 
                     <div class="absolute top-3 right-3">
-                      <button
-                        class="w-8 h-8 bg-white border-2 border-black text-black hover:bg-red-500 hover:text-white flex items-center justify-center transition-all delete-btn shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
-                        data-id="<%= video.id %>">
+                      <button onclick="deleteVideo('<%= video.id %>')" class="w-8 h-8 bg-white border-2 border-black text-black hover:bg-red-500 hover:text-white flex items-center justify-center transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                         <i class="fas fa-trash-alt text-xs"></i>
                       </button>
                     </div>
 
                     <div class="absolute bottom-0 left-0 right-0 bg-white border-t-2 border-black p-2">
-                      <h3 class="font-bold text-black text-sm truncate uppercase">
-                        <%= video.title %>
-                      </h3>
+                      <h3 class="font-bold text-black text-sm truncate uppercase"><%= video.title %></h3>
                     </div>
                   </div>
 
                   <div class="p-4 flex-1 flex flex-col gap-4 mt-2">
-                    <div class="space-y-3">
-                      <div id="destinations-container-<%= video.id %>" class="space-y-2">
-                        <% if (video.destinations && video.destinations.length> 0) { %>
-                          <% video.destinations.forEach((fullUrl, index)=> {
-                            let type = 'custom';
-                            let inputValue = fullUrl;
-
-                            if (fullUrl.startsWith('rtmp://a.rtmp.youtube.com/live2/')) {
-                            type = 'youtube';
-                            inputValue = fullUrl.replace('rtmp://a.rtmp.youtube.com/live2/', '');
-                            } else if (fullUrl.startsWith('rtmps://live-api-s.facebook.com:443/rtmp/')) {
-                            type = 'facebook';
-                            inputValue = fullUrl.replace('rtmps://live-api-s.facebook.com:443/rtmp/', '');
-                            } else if (fullUrl.startsWith('rtmp://live.twitch.tv/app/')) {
-                            type = 'twitch';
-                            inputValue = fullUrl.replace('rtmp://live.twitch.tv/app/', '');
-                            }
+                      
+                      <div class="space-y-3">
+                          <div id="destinations-container-<%= video.id %>" class="space-y-2">
+                            <% 
+                               let dests = [];
+                               try { dests = typeof video.destinations === 'string' ? JSON.parse(video.destinations) : (video.destinations || []); } catch(e) { dests = []; }
                             %>
-                            <div class="flex flex-col gap-1 destination-row mb-2 border-b-2 border-black/10 pb-2">
-                              <div class="flex items-stretch gap-1">
-                                <select
-                                  class="bg-gray-50 border-2 border-black px-2 py-2 text-[10px] font-bold outline-none focus:bg-yellow-100 uppercase platform-select font-mono w-24"
-                                  onchange="updatePlaceholder(this)">
-                                  <option value="custom" <%=type==='custom' ? 'selected' : '' %>>Custom</option>
-                                  <option value="youtube" <%=type==='youtube' ? 'selected' : '' %>>YouTube</option>
-                                  <option value="facebook" <%=type==='facebook' ? 'selected' : '' %>>Facebook</option>
-                                  <option value="twitch" <%=type==='twitch' ? 'selected' : '' %>>Twitch</option>
-                                </select>
-                                <div class="relative group/input flex-1">
-                                  <div class="absolute left-3 top-2.5 text-black z-20"><i
-                                      class="fas fa-key text-xs"></i>
-                                  </div>
-                                  <input type="password" value="<%= inputValue %>"
-                                    class="w-full h-full bg-gray-50 border-2 border-black px-3 pl-9 py-2 text-xs text-black focus:bg-yellow-100 outline-none transition-all placeholder-gray-500 font-mono destination-input relative z-10"
-                                    placeholder="RTMP URL or Stream Key">
-                                  <button type="button"
-                                    onclick="const i = this.previousElementSibling; i.type = i.type === 'password' ? 'text' : 'password'; this.innerHTML = i.type === 'password' ? '<i class=\'fas fa-eye\'></i>' : '<i class=\'fas fa-eye-slash\'></i>';"
-                                    class="absolute right-2 top-2 z-30 text-gray-500 hover:text-black">
-                                    <i class="fas fa-eye"></i>
-                                  </button>
-                                </div>
-                                <button type="button" onclick="this.closest('.destination-row').remove()"
-                                  class="bg-red-500 text-white border-2 border-black w-8 flex items-center justify-center hover:bg-red-600 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]">
-                                  <i class="fas fa-times text-xs"></i>
-                                </button>
-                              </div>
-                              <div
-                                class="prefix-display text-[10px] font-mono text-gray-500 pl-1 <%= type === 'custom' ? 'hidden' : 'block' %>">
-                                <%= type !=='custom' ? 'Server: ' + (type==='youtube'
-                                  ? 'rtmp://a.rtmp.youtube.com/live2/' : (type==='facebook'
-                                  ? 'rtmps://live-api-s.facebook.com:443/rtmp/' : 'rtmp://live.twitch.tv/app/' )) : ''
-                                  %>
-                              </div>
-                            </div>
-                            <% }) %>
-                              <% } else { %>
+                            
+                            <% if (dests.length > 0) { %>
+                                <% dests.forEach((fullUrl)=> { 
+                                    let type = 'custom';
+                                    let val = fullUrl;
+                                    if(fullUrl.includes('youtube')) { type = 'youtube'; val = fullUrl.replace('rtmp://a.rtmp.youtube.com/live2/', ''); }
+                                    else if(fullUrl.includes('facebook')) { type = 'facebook'; val = fullUrl.replace('rtmps://live-api-s.facebook.com:443/rtmp/', ''); }
+                                    else if(fullUrl.includes('twitch')) { type = 'twitch'; val = fullUrl.replace('rtmp://live.twitch.tv/app/', ''); }
+                                %>
                                 <div class="flex flex-col gap-1 destination-row mb-2 border-b-2 border-black/10 pb-2">
-                                  <div class="flex items-stretch gap-1">
-                                    <select
-                                      class="bg-gray-50 border-2 border-black px-2 py-2 text-[10px] font-bold outline-none focus:bg-yellow-100 uppercase platform-select font-mono w-24"
-                                      onchange="updatePlaceholder(this)">
-                                      <option value="custom">Custom</option>
-                                      <option value="youtube">YouTube</option>
-                                      <option value="facebook">Facebook</option>
-                                      <option value="twitch">Twitch</option>
-                                    </select>
-                                    <div class="relative group/input flex-1">
-                                      <div class="absolute left-3 top-2.5 text-black z-20"><i
-                                          class="fas fa-key text-xs"></i></div>
-                                      <input type="text" value=""
-                                        class="w-full h-full bg-gray-50 border-2 border-black px-3 pl-9 py-2 text-xs text-black focus:bg-yellow-100 outline-none transition-all placeholder-gray-500 font-mono destination-input relative z-10"
-                                        placeholder="RTMP URL (e.g. rtmp://site.com/live/key)">
+                                    <div class="flex items-stretch gap-1">
+                                        <select class="bg-gray-50 border-2 border-black px-2 py-2 text-[10px] font-bold outline-none uppercase font-mono w-24" onchange="updatePlaceholder(this)">
+                                            <option value="custom" <%= type==='custom'?'selected':'' %>>Custom</option>
+                                            <option value="youtube" <%= type==='youtube'?'selected':'' %>>YouTube</option>
+                                            <option value="facebook" <%= type==='facebook'?'selected':'' %>>Facebook</option>
+                                            <option value="twitch" <%= type==='twitch'?'selected':'' %>>Twitch</option>
+                                        </select>
+                                        <div class="relative group/input flex-1">
+                                            <div class="absolute left-3 top-2.5 text-black z-20"><i class="fas fa-key text-xs"></i></div>
+                                            <input type="password" value="<%= val %>" class="w-full h-full bg-gray-50 border-2 border-black px-3 pl-9 py-2 text-xs text-black outline-none font-mono destination-input relative z-10">
+                                            <button type="button" onclick="const i=this.previousElementSibling; i.type=i.type==='password'?'text':'password';" class="absolute right-2 top-2 z-30 text-gray-500 hover:text-black"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                        <button type="button" onclick="this.closest('.destination-row').remove()" class="bg-red-500 text-white border-2 border-black w-8 hover:bg-red-600"><i class="fas fa-times text-xs"></i></button>
                                     </div>
-                                    <button type="button" onclick="this.closest('.destination-row').remove()"
-                                      class="bg-red-500 text-white border-2 border-black w-8 flex items-center justify-center hover:bg-red-600 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]">
-                                      <i class="fas fa-times text-xs"></i>
-                                    </button>
-                                  </div>
-                                  <div class="prefix-display text-[10px] font-mono text-gray-500 pl-1 hidden"></div>
-                                </div> </button>
+                                </div>
+                                <% }) %>
+                            <% } %>
+                          </div>
+
+                          <button type="button" onclick="addDestination('<%= video.id %>')" class="w-full bg-cyan-100 hover:bg-cyan-200 text-black border-2 border-black py-1.5 text-[10px] font-bold uppercase transition-colors border-dashed">
+                            + <%= t.add_destination || 'Add Destination' %>
+                          </button>
                       </div>
-                      <% } %>
-                    </div>
 
-                    <button type="button" onclick="addDestination('<%= video.id %>')"
-                      class="w-full bg-cyan-100 hover:bg-cyan-200 text-black border-2 border-black py-1.5 text-[10px] font-bold uppercase transition-colors border-dashed">
-                      + <%= t.add_destination || 'Add Destination' %>
-                    </button>
+                      <div class="grid grid-cols-3 gap-2">
+                        <select id="res-<%= video.id %>" class="bg-white border-2 border-black px-2 py-1.5 text-[10px] text-black font-bold outline-none focus:bg-cyan-100">
+                          <option value="852x480" <%= video.resolution==='852x480' ? 'selected' : '' %>>480p</option>
+                          <option value="1280x720" <%= (!video.resolution || video.resolution==='1280x720') ? 'selected' : '' %>>720p</option>
+                          <option value="1920x1080" <%= video.resolution==='1920x1080' ? 'selected' : '' %>>1080p</option>
+                        </select>
+                        <select id="fps-<%= video.id %>" class="bg-white border-2 border-black px-2 py-1.5 text-[10px] text-black font-bold outline-none focus:bg-cyan-100">
+                          <option value="24" <%= video.fps==='24' ? 'selected' : '' %>>24 FPS</option>
+                          <option value="30" <%= (!video.fps || video.fps==='30') ? 'selected' : '' %>>30 FPS</option>
+                          <option value="60" <%= video.fps==='60' ? 'selected' : '' %>>60 FPS</option>
+                        </select>
+                        <select id="bit-<%= video.id %>" class="bg-white border-2 border-black px-2 py-1.5 text-[10px] text-black font-bold outline-none focus:bg-cyan-100">
+                          <option value="2500k" <%= (!video.bitrate || video.bitrate==='2500k') ? 'selected' : '' %>>Std (2500k)</option>
+                          <option value="4500k" <%= video.bitrate==='4500k' ? 'selected' : '' %>>High (4500k)</option>
+                          <option value="6000k" <%= video.bitrate==='6000k' ? 'selected' : '' %>>Ultra (6000k)</option>
+                        </select>
+                      </div>
+
+                      <div class="flex items-center justify-between mt-auto pt-2 border-t-2 border-black border-dashed">
+                        <label class="flex items-center gap-2 cursor-pointer group/check select-none">
+                            <input type="checkbox" id="loop-<%= video.id %>" <%= video.loop ? 'checked' : '' %> class="accent-black w-4 h-4 border-2 border-black rounded-none">
+                            <span class="text-[10px] text-black font-bold uppercase group-hover/check:text-pink-600 transition-colors"><%= t.loop_video %></span>
+                        </label>
+                        <button onclick="saveConfig('<%= video.id %>')" class="bg-white hover:bg-yellow-300 text-black border-2 border-black px-2 py-0.5 text-[10px] font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all">
+                            <i class="fas fa-save"></i> SAVE
+                        </button>
+                      </div>
+
+                      <button class="w-full border-2 border-black font-black py-2.5 transition-all start-btn shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-xs flex items-center justify-center gap-2 uppercase tracking-wider <%= video.start_time ? 'bg-red-500 text-white animate-pulse' : 'bg-black text-white hover:bg-white hover:text-black' %>"
+                        data-id="<%= video.id %>" 
+                        data-running="<%= Boolean(video.start_time) %>">
+                        <% if(video.start_time) { %>
+                            <i class="fas fa-stop text-[10px]"></i> <span>STOP STREAM</span>
+                        <% } else { %>
+                            <i class="fas fa-play text-[10px]"></i> <span>START STREAM</span>
+                        <% } %>
+                      </button>
+
                   </div>
-
-                  <div class="grid grid-cols-3 gap-2">
-                    <select id="res-<%= video.id %>"
-                      class="bg-white border-2 border-black px-2 py-1.5 text-[10px] text-black font-bold outline-none focus:bg-cyan-100">
-                      <option value="852x480" <%=video.resolution==='852x480' ? 'selected' : '' %>>480p</option>
-                      <option value="1280x720" <%=(!video.resolution || video.resolution==='1280x720' ) ? 'selected'
-                        : '' %>>720p</option>
-                      <option value="1920x1080" <%=video.resolution==='1920x1080' ? 'selected' : '' %>>1080p</option>
-                    </select>
-                    <select id="fps-<%= video.id %>"
-                      class="bg-white border-2 border-black px-2 py-1.5 text-[10px] text-black font-bold outline-none focus:bg-cyan-100">
-                      <option value="24" <%=video.fps==='24' ? 'selected' : '' %>>24 FPS</option>
-                      <option value="30" <%=(!video.fps || video.fps==='30' ) ? 'selected' : '' %>>30 FPS</option>
-                      <option value="60" <%=video.fps==='60' ? 'selected' : '' %>>60 FPS</option>
-                    </select>
-                    <select id="bit-<%= video.id %>"
-                      class="bg-white border-2 border-black px-2 py-1.5 text-[10px] text-black font-bold outline-none focus:bg-cyan-100">
-                      <option value="2500k" <%=(!video.bitrate || video.bitrate==='2500k' ) ? 'selected' : '' %>
-                        >Standard (2500k)</option>
-                      <option value="4500k" <%=video.bitrate==='4500k' ? 'selected' : '' %>>High (4500k)</option>
-                      <option value="6000k" <%=video.bitrate==='6000k' ? 'selected' : '' %>>Ultra (6000k)</option>
-                      <option value="8000k" <%=video.bitrate==='8000k' ? 'selected' : '' %>>Extreme (8000k)</option>
-                    </select>
-                  </div>
-
-                  <div class="flex items-center justify-between mt-auto pt-2 border-t-2 border-black border-dashed">
-                    <label class="flex items-center gap-2 cursor-pointer group/check select-none">
-                      <input type="checkbox" id="loop-<%= video.id %>" <%=video.loop ? 'checked' : '' %>
-                      class="accent-black w-4 h-4 border-2 border-black rounded-none focus:ring-0">
-                      <span
-                        class="text-[10px] text-black font-bold uppercase group-hover/check:text-pink-600 transition-colors">
-                        <%= t.loop_video %>
-                      </span>
-                    </label>
-                    <button onclick="saveConfig('<%= video.id %>')"
-                      class="bg-white hover:bg-yellow-300 text-black border-2 border-black px-2 py-0.5 text-[10px] font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all"
-                      title="Save Configuration">
-                      <i class="fas fa-save"></i> SAVE
-                    </button>
-                  </div>
-
-                  <button
-                    class="w-full bg-black text-white hover:bg-white hover:text-black border-2 border-black font-black py-2.5 transition-all start-btn shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-xs flex items-center justify-center gap-2 uppercase tracking-wider"
-                    data-id="<%= video.id %>" data-running="<%= Boolean(video.start_time) %>"
-                    data-start-time="<%= video.start_time || '' %>">
-                    <i class="fas fa-play text-[10px]"></i> <span>
-                      <%= video.start_time ? 'Stop Stream' : t.start_stream %>
-                    </span>
-                  </button>
-                </div>
-            </div>
+              </div>
             <% }) %>
-    </div>
-    <% } %>
-
-      </main>
-      </div>
-
-      <div id="uploadModal" class="fixed inset-0 bg-black/80 z-[60] hidden flex items-center justify-center p-4">
-        <div
-          class="bg-white w-full max-w-lg border-4 border-black box-shadow shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] p-6 relative">
-          <div class="flex items-center justify-between mb-6 border-b-2 border-black pb-4">
-            <h2 class="text-2xl font-black text-black uppercase flex items-center gap-2"><i
-                class="fas fa-cloud-upload-alt"></i>
-              <%= t.upload_btn %>
-            </h2>
-            <button id="closeModal"
-              class="text-black hover:bg-black hover:text-white border-2 border-black transition-colors w-8 h-8 flex items-center justify-center"><i
-                class="fas fa-times"></i></button>
           </div>
+        <% } %>
+      </main>
+  </div>
 
-          <form id="uploadForm" class="space-y-5">
-            <div>
-              <label
-                class="block text-xs font-bold text-black uppercase mb-1.5 bg-yellow-300 inline-block px-1 border-2 border-black">
-                <%= t.upload_title %>
-              </label>
-              <input type="text" name="title"
-                class="w-full bg-white border-2 border-black px-4 py-3 text-sm text-black focus:bg-yellow-50 outline-none transition-all placeholder-gray-400 font-bold"
-                placeholder="E.G. MY AWESOME STREAM" required>
-            </div>
-
-            <div
-              class="border-2 border-dashed border-black bg-gray-50 p-8 text-center cursor-pointer hover:bg-cyan-50 transition-all group relative"
-              id="dropZone">
-              <input type="file" name="video" id="videoInput" accept="video/mp4" class="hidden" required>
-              <div
-                class="w-14 h-14 bg-white border-2 border-black flex items-center justify-center mx-auto mb-3 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:shadow-none transition-all">
-                <i class="fas fa-file-video text-xl"></i>
-              </div>
-              <div id="fileName" class="text-sm font-black text-black uppercase">
-                <%= t.upload_file %>
-              </div>
-              <div class="text-xs text-gray-500 mt-1 font-bold">
-                <%= t.mp4_only %>
-              </div>
-            </div>
-
-            <button type="submit"
-              class="w-full bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-black py-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-lg">
-              <span>
-                <%= t.upload_submit %>
-              </span>
-              <i class="fas fa-arrow-right"></i>
-            </button>
-          </form>
-        </div>
+  <div id="uploadModal" class="fixed inset-0 bg-black/80 z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg border-4 border-black box-shadow shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] p-6 relative">
+      
+      <div class="flex items-center justify-between mb-6 border-b-2 border-black pb-4">
+        <h2 class="text-2xl font-black text-black uppercase flex items-center gap-2">
+          <i class="fas fa-cloud-upload-alt"></i> <%= t.upload_btn %>
+        </h2>
+        <button onclick="document.getElementById('uploadModal').classList.add('hidden')" class="text-black hover:bg-black hover:text-white border-2 border-black transition-colors w-8 h-8 flex items-center justify-center">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
 
-      <script src="/socket.io/socket.io.js"></script>
-      <script src="/js/script.js"></script>
-      <script>
-        const sidebar = document.getElementById('sidebar');
-        const mobileOverlay = document.getElementById('mobile-overlay');
-        const openSidebarBtn = document.getElementById('open-sidebar');
-        const closeSidebarBtn = document.getElementById('close-sidebar');
+      <form id="chunkUploadForm" class="space-y-5">
+        <div>
+          <label class="block text-xs font-bold text-black uppercase mb-1.5 bg-yellow-300 inline-block px-1 border-2 border-black"><%= t.upload_title %></label>
+          <input type="text" id="videoTitle" class="w-full bg-white border-2 border-black px-4 py-3 text-sm text-black focus:bg-yellow-50 outline-none transition-all placeholder-gray-400 font-bold" placeholder="E.G. MY AWESOME STREAM" required>
+        </div>
 
-        function toggleSidebar() {
-          const isClosed = sidebar.classList.contains('-translate-x-full');
-          if (isClosed) {
-            sidebar.classList.remove('-translate-x-full');
-            mobileOverlay.classList.remove('hidden');
-          } else {
-            sidebar.classList.add('-translate-x-full');
-            mobileOverlay.classList.add('hidden');
-          }
+        <div class="border-2 border-dashed border-black bg-gray-50 p-8 text-center cursor-pointer hover:bg-cyan-50 transition-all group relative" id="dropZone" onclick="document.getElementById('videoInput').click()">
+          <input type="file" id="videoInput" accept="video/mp4" class="hidden" required>
+          <div class="w-14 h-14 bg-white border-2 border-black flex items-center justify-center mx-auto mb-3 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:shadow-none transition-all">
+            <i class="fas fa-file-video text-xl"></i>
+          </div>
+          <div id="fileNameDisplay" class="text-sm font-black text-black uppercase"><%= t.upload_file %></div>
+          <div class="text-xs text-gray-500 mt-1 font-bold"><%= t.mp4_only %></div>
+        </div>
+
+        <div id="progressContainer" class="hidden">
+           <div class="flex justify-between text-xs font-bold uppercase mb-1">
+              <span id="progressStatus">Uploading...</span>
+              <span id="progressPercent">0%</span>
+           </div>
+           <div class="w-full bg-gray-200 border-2 border-black h-5 p-0.5">
+              <div id="progressBar" class="bg-lime-400 h-full w-0 border-r-2 border-black transition-all duration-300"></div>
+           </div>
+        </div>
+
+        <button type="submit" id="uploadBtn" class="w-full bg-lime-400 hover:bg-lime-300 text-black border-2 border-black font-black py-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-lg">
+          <span><%= t.upload_submit %></span> <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <script>
+    const socket = io();
+
+    // --- 1. REALTIME STREAM STATUS & SYSTEM STATS ---
+    
+    // Update System Stats (CPU, RAM, Active)
+    socket.on('systemStats', (stats) => {
+        if(document.getElementById('cpu-text')) document.getElementById('cpu-text').innerText = stats.cpu + '%';
+        if(document.getElementById('cpu-bar')) document.getElementById('cpu-bar').style.width = stats.cpu + '%';
+        if(document.getElementById('ram-text')) document.getElementById('ram-text').innerText = stats.ram + '%';
+        if(document.getElementById('ram-bar')) document.getElementById('ram-bar').style.width = stats.ram + '%';
+        if(document.getElementById('active-count')) document.getElementById('active-count').innerText = stats.activeStreams || 0;
+    });
+
+    // Update Stream Buttons & Badges
+    socket.on('streamStatus', (data) => {
+      const { videoId, running } = data;
+      const btn = document.querySelector(`button[data-id="${videoId}"]`);
+      const statusSpan = document.getElementById(`status-${videoId}`);
+      const dot = document.getElementById(`dot-${videoId}`);
+
+      if (btn) {
+        if (running) {
+          btn.innerHTML = '<i class="fas fa-stop text-[10px]"></i> <span>STOP STREAM</span>';
+          btn.classList.remove('bg-black', 'text-white', 'hover:bg-white', 'hover:text-black');
+          btn.classList.add('bg-red-500', 'text-white', 'animate-pulse');
+          btn.dataset.running = "true";
+        } else {
+          btn.innerHTML = '<i class="fas fa-play text-[10px]"></i> <span>START STREAM</span>';
+          btn.classList.add('bg-black', 'text-white', 'hover:bg-white', 'hover:text-black');
+          btn.classList.remove('bg-red-500', 'text-white', 'animate-pulse');
+          btn.dataset.running = "false";
+        }
+      }
+
+      if (statusSpan && dot) {
+        if (running) {
+            statusSpan.innerText = "LIVE NOW";
+            statusSpan.classList.add('text-green-400');
+            dot.classList.remove('bg-red-500');
+            dot.classList.add('bg-green-400', 'animate-ping');
+        } else {
+            statusSpan.innerText = "OFFLINE";
+            statusSpan.classList.remove('text-green-400');
+            dot.classList.add('bg-red-500');
+            dot.classList.remove('bg-green-400', 'animate-ping');
+        }
+      }
+    });
+
+    // --- 2. UPLOAD LOGIC (CHUNKED) ---
+    const form = document.getElementById('chunkUploadForm');
+    const fileInput = document.getElementById('videoInput');
+    const titleInput = document.getElementById('videoTitle');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressStatus = document.getElementById('progressStatus');
+    const uploadBtn = document.getElementById('uploadBtn');
+
+    fileInput.addEventListener('change', () => {
+        if(fileInput.files[0]) fileNameDisplay.innerText = fileInput.files[0].name;
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const file = fileInput.files[0];
+        const title = titleInput.value;
+
+        if (!file) return Swal.fire('Error', 'Please select a file', 'error');
+
+        uploadBtn.disabled = true;
+        uploadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        progressContainer.classList.remove('hidden');
+        
+        const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB Chunk
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        const fileId = Date.now().toString();
+        const fileName = fileId + '-' + file.name.replace(/\s+/g, '_');
+
+        let chunkIndex = 0;
+
+        for (let start = 0; start < file.size; start += CHUNK_SIZE) {
+            const chunk = file.slice(start, start + CHUNK_SIZE);
+            const formData = new FormData();
+            formData.append('chunk', chunk);
+            formData.append('fileId', fileId);
+            formData.append('chunkIndex', chunkIndex);
+
+            try {
+                const res = await fetch('/api/upload/local/chunk', { method: 'POST', body: formData });
+                if (!res.ok) throw new Error('Chunk upload failed');
+                
+                chunkIndex++;
+                const percent = Math.round((chunkIndex / totalChunks) * 100);
+                progressBar.style.width = percent + '%';
+                progressPercent.innerText = percent + '%';
+            } catch (err) {
+                console.error(err);
+                Swal.fire('Error', 'Connection lost.', 'error');
+                resetUI();
+                return;
+            }
         }
 
-        if (openSidebarBtn) openSidebarBtn.addEventListener('click', toggleSidebar);
-        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
-        if (mobileOverlay) mobileOverlay.addEventListener('click', toggleSidebar);
-      </script>
-</body>
+        try {
+            progressStatus.innerText = 'Processing...';
+            const res = await fetch('/api/upload/local/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fileId, fileName, totalChunks, title })
+            });
+            if (!res.ok) throw new Error('Merge failed');
+            
+            Swal.fire({ title: 'Success!', icon: 'success', confirmButtonColor: '#000' })
+                .then(() => window.location.reload());
+        } catch (err) {
+            Swal.fire('Error', 'Failed to process.', 'error');
+            resetUI();
+        }
+    });
 
+    function resetUI() {
+        uploadBtn.disabled = false;
+        uploadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        progressContainer.classList.add('hidden');
+        progressBar.style.width = '0%';
+    }
+
+    // --- 3. STREAM & VIDEO MANAGEMENT ---
+    
+    // Start/Stop Stream
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.start-btn');
+        if (!btn) return;
+
+        const videoId = btn.dataset.id;
+        const isRunning = btn.dataset.running === "true";
+
+        const res = document.getElementById(`res-${videoId}`)?.value || '1280x720';
+        const fps = document.getElementById(`fps-${videoId}`)?.value || '30';
+        const bitrate = document.getElementById(`bit-${videoId}`)?.value || '2500k';
+        const loop = document.getElementById(`loop-${videoId}`)?.checked || false;
+
+        const destinations = [];
+        const container = document.getElementById(`destinations-container-${videoId}`);
+        if(container) {
+            container.querySelectorAll('.destination-row').forEach(row => {
+               const type = row.querySelector('select').value;
+               const input = row.querySelector('input').value;
+               let url = input;
+               if(type === 'youtube') url = 'rtmp://a.rtmp.youtube.com/live2/' + input;
+               else if(type === 'facebook') url = 'rtmps://live-api-s.facebook.com:443/rtmp/' + input;
+               else if(type === 'twitch') url = 'rtmp://live.twitch.tv/app/' + input;
+               if(input) destinations.push(url);
+            });
+        }
+
+        if(destinations.length === 0 && !isRunning) return Swal.fire('Error', 'Add at least one destination!', 'warning');
+
+        const endpoint = isRunning ? '/api/stream/stop' : '/api/stream/start';
+        
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ videoId, settings: { resolution: res, fps, bitrate }, loop, customRtmp: destinations })
+            });
+            const result = await response.json();
+            if(!response.ok) throw new Error(result.error || 'Failed');
+        } catch (err) {
+            Swal.fire('Error', err.message, 'error');
+        }
+    });
+
+    // Delete Video
+    window.deleteVideo = (id) => {
+        Swal.fire({
+            title: 'Delete Video?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#000',
+            confirmButtonText: 'Delete'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/api/video/' + id, { method: 'DELETE' })
+                .then(res => { if(res.ok) window.location.reload(); else Swal.fire('Error', 'Failed', 'error'); });
+            }
+        })
+    };
+
+    // Save Config Only
+    window.saveConfig = async (videoId) => {
+        const res = document.getElementById(`res-${videoId}`).value;
+        const fps = document.getElementById(`fps-${videoId}`).value;
+        const bitrate = document.getElementById(`bit-${videoId}`).value;
+        const loop = document.getElementById(`loop-${videoId}`).checked;
+        const destinations = [];
+        const container = document.getElementById(`destinations-container-${videoId}`);
+        if(container) {
+            container.querySelectorAll('.destination-row').forEach(row => {
+               const type = row.querySelector('select').value;
+               const input = row.querySelector('input').value;
+               let url = input;
+               if(type === 'youtube') url = 'rtmp://a.rtmp.youtube.com/live2/' + input;
+               else if(type === 'facebook') url = 'rtmps://live-api-s.facebook.com:443/rtmp/' + input;
+               else if(type === 'twitch') url = 'rtmp://live.twitch.tv/app/' + input;
+               if(input) destinations.push(url);
+            });
+        }
+
+        try {
+            await fetch('/api/stream/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ videoId, settings: { resolution: res, fps, bitrate }, loop, customRtmp: destinations })
+            });
+            Swal.fire('Saved', 'Configuration saved!', 'success');
+        } catch(e) { Swal.fire('Error', 'Failed to save', 'error'); }
+    };
+
+    // UI Helpers
+    window.addDestination = (videoId) => {
+        const container = document.getElementById(`destinations-container-${videoId}`);
+        const div = document.createElement('div');
+        div.className = 'flex flex-col gap-1 destination-row mb-2 border-b-2 border-black/10 pb-2';
+        div.innerHTML = `
+            <div class="flex items-stretch gap-1">
+                <select class="bg-gray-50 border-2 border-black px-2 py-2 text-[10px] font-bold outline-none uppercase font-mono w-24" onchange="updatePlaceholder(this)">
+                    <option value="custom">Custom</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="twitch">Twitch</option>
+                </select>
+                <div class="relative group/input flex-1">
+                    <div class="absolute left-3 top-2.5 text-black z-20"><i class="fas fa-key text-xs"></i></div>
+                    <input type="text" class="w-full h-full bg-gray-50 border-2 border-black px-3 pl-9 py-2 text-xs text-black outline-none font-mono destination-input" placeholder="RTMP URL">
+                </div>
+                <button type="button" onclick="this.closest('.destination-row').remove()" class="bg-red-500 text-white border-2 border-black w-8 hover:bg-red-600"><i class="fas fa-times text-xs"></i></button>
+            </div>`;
+        container.appendChild(div);
+    };
+
+    window.updatePlaceholder = (select) => {
+        const input = select.nextElementSibling.querySelector('input');
+        if(select.value === 'custom') input.placeholder = 'RTMP URL';
+        else input.placeholder = 'Stream Key';
+    };
+
+    // Sidebar
+    const sidebar = document.getElementById('sidebar'); 
+    const openSidebarBtn = document.getElementById('open-sidebar');
+    if(openSidebarBtn && sidebar) {
+        openSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+    }
+  </script>
+</body>
 </html>
