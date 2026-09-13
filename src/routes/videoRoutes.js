@@ -29,22 +29,21 @@ router.delete("/:id", (req, res) => {
          }
       }
 
-      const uploadDir = path.join(__dirname, "../../public/uploads");
+      const baseUploadDir = path.resolve(process.env.UPLOAD_PATH || path.join(__dirname, "../../public/uploads"));
 
       if (row.filename) {
-         const fullPath = path.join(uploadDir, row.filename);
+         const safeFilename = path.basename(row.filename);
+         const fullPath = path.join(baseUploadDir, safeFilename);
          if (fs.existsSync(fullPath)) {
             fs.unlink(fullPath, (err) => {
-               if (err) logger.error(`Error deleting file ${fullPath}: $(err)`);
+               if (err) logger.error(`Error deleting file ${fullPath}: ${err}`);
             });
          }
       }
 
       if (row.thumbnail) {
-         let thumbPath = row.thumbnail;
-         if (!path.isAbsolute(thumbPath)) {
-            thumbPath = path.join(__dirname, "../../public", row.thumbnail);
-         }
+         const safeThumbnail = path.basename(row.thumbnail);
+         const thumbPath = path.join(baseUploadDir, "thumbnails", safeThumbnail);
          if (fs.existsSync(thumbPath)) {
             fs.unlink(thumbPath, (err) => {
                if (err) logger.error(`Error deleting thumbnail ${thumbPath}: ${err}`);

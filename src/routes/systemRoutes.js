@@ -6,14 +6,20 @@ const { exec } = require('child_process');
 function getDiskUsage() {
     return new Promise((resolve) => {
         exec('df -h /', (err, stdout) => {
-            if (err) return resolve({ percent: 0, text: 'N/A' });
-            const lines = stdout.trim().split('\n');
-            const data = lines[1].split(/\s+/);
-            resolve({
-                total: data[1],
-                used: data[2],
-                percent: parseInt(data[4].replace('%', ''))
-            });
+            if (err || !stdout) return resolve({ percent: 0, text: 'N/A' });
+            try {
+                const lines = stdout.trim().split('\n');
+                if (lines.length < 2) return resolve({ percent: 0, text: 'N/A' });
+                const data = lines[1].split(/\s+/);
+                if (data.length < 5) return resolve({ percent: 0, text: 'N/A' });
+                resolve({
+                    total: data[1] || 'N/A',
+                    used: data[2] || 'N/A',
+                    percent: parseInt((data[4] || '0').replace('%', ''), 10) || 0
+                });
+            } catch {
+                resolve({ percent: 0, text: 'N/A' });
+            }
         });
     });
 }

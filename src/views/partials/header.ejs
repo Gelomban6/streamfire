@@ -1,11 +1,4 @@
 <script>
-    // Suppress Tailwind CDN warning
-    const originalWarn = console.warn;
-    console.warn = (...args) => {
-        if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
-        originalWarn(...args);
-    };
-
     // Client-side translations
     window.t = {
         delete_confirm_title: "<%= t.delete_confirm_title %>",
@@ -75,16 +68,15 @@
         </a>
     </nav>
 
-    <div class="p-4 border-t-2 border-black bg-yellow-50 cursor-pointer hover:bg-yellow-100 transition-colors"
-        onclick="window.location.href='/profile'">
-        <div class="flex items-center gap-3">
+    <a href="/profile" class="p-4 border-t-2 border-black bg-yellow-50 cursor-pointer hover:bg-yellow-100 transition-colors flex items-center gap-3">
+        <div class="w-10 h-10 border-2 border-black overflow-hidden bg-white flex-shrink-0">
             <% if (user && user.avatar) { %>
                 <img src="/uploads/avatars/<%= user.avatar %>" alt="Avatar" class="w-full h-full object-cover">
-                <% } else { %>
-                    <div class="w-full h-full flex items-center justify-center bg-white">
-                        <img src="/img/logo.png" alt="Avatar" class="w-full h-full object-cover">
-                    </div>
-                    <% } %>
+            <% } else { %>
+                <div class="w-full h-full flex items-center justify-center bg-white">
+                    <img src="/img/logo.png" alt="Avatar" class="w-full h-full object-cover">
+                </div>
+            <% } %>
         </div>
         <div class="flex-1 overflow-hidden">
             <div class="text-sm font-bold text-black truncate">
@@ -92,6 +84,6 @@
             </div>
             <div class="text-[10px] text-black font-mono truncate">Administrator</div>
         </div>
-    </div>
+    </a>
 </div>
 </div>

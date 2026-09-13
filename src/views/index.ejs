@@ -9,7 +9,7 @@
   </title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/output.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body { font-family: 'Outfit', sans-serif; background-color: #f0f9ff; }
@@ -359,20 +359,30 @@
             formData.append('fileId', fileId);
             formData.append('chunkIndex', chunkIndex);
 
-            try {
-                const res = await fetch('/api/upload/local/chunk', { method: 'POST', body: formData });
-                if (!res.ok) throw new Error('Chunk upload failed');
-                
-                chunkIndex++;
-                const percent = Math.round((chunkIndex / totalChunks) * 100);
-                progressBar.style.width = percent + '%';
-                progressPercent.innerText = percent + '%';
-            } catch (err) {
-                console.error(err);
-                Swal.fire('Error', 'Connection lost.', 'error');
-                resetUI();
-                return;
+            let uploaded = false;
+            let retries = 3;
+
+            while (!uploaded && retries > 0) {
+                try {
+                    const res = await fetch('/api/upload/local/chunk', { method: 'POST', body: formData });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    uploaded = true;
+                } catch (err) {
+                    retries--;
+                    if (retries === 0) {
+                        console.error(err);
+                        Swal.fire('Error', `Upload failed at chunk ${chunkIndex + 1}/${totalChunks}.`, 'error');
+                        resetUI();
+                        return;
+                    }
+                    await new Promise(r => setTimeout(r, 1000));
+                }
             }
+
+            chunkIndex++;
+            const percent = Math.round((chunkIndex / totalChunks) * 100);
+            progressBar.style.width = percent + '%';
+            progressPercent.innerText = percent + '%';
         }
 
         try {

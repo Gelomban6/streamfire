@@ -12,6 +12,7 @@ const server = http.createServer(app);
 const io = socketIo(server, { cors: { origin: "*" } });
 global.io = io;
 
+const helmet = require('helmet');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const db = require('./src/models/database');
@@ -30,11 +31,29 @@ const i18n = require('./src/middleware/i18n');
 global.streamProcesses = {};
 global.activityLogs = [];
 
-app.use(cors());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+      scriptSrcAttr: ["'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      mediaSrc: ["'self'", "blob:"],
+      connectSrc: ["'self'", "ws:", "wss:"]
+    }
+  },
+  crossOriginEmbedderPolicy: false
+}));
+
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  res.removeHeader('Cross-Origin-Opener-Policy');
-  res.removeHeader('Cross-Origin-Embedder-Policy');
   next();
 });
 
@@ -46,18 +65,39 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/views'));
 
-app.use(session({
+const sessionSecret = process.env.SESSION_SECRET || 'streamfire_default_fallback_secret_change_in_production';
+if (!process.env.SESSION_SECRET) {
+  console.warn('[SECURITY WARNING] SESSION_SECRET is not set in .env. Using fallback secret.');
+}
+
+const sessionMiddleware = session({
   store: new SQLiteStore({ db: 'sessions.db', dir: './db' }),
-  secret: process.env.SESSION_SECRET || 'secret_key',
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }
-}));
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  }
+});
+
+app.use(sessionMiddleware);
+
+io.use((socket, next) => {
+  sessionMiddleware(socket.request, {}, () => {
+    const sess = socket.request.session;
+    if (sess && sess.userId) {
+      return next();
+    }
+    next(new Error('Authentication required'));
+  });
+});
 
 app.use(checkSetup);
 app.use((req, res, next) => {
-  if (req.path.startsWith('/uploads') ||
-    req.path.startsWith('/css') ||
+  if (req.path.startsWith('/css') ||
     req.path.startsWith('/js') ||
     req.path.startsWith('/img') ||
     req.path.startsWith('/login') ||

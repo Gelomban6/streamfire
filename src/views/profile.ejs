@@ -9,7 +9,7 @@
     </title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/output.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
@@ -165,13 +165,6 @@
             </main>
         </div>
 
-        <script>
-            const originalWarn = console.warn;
-            console.warn = (...args) => {
-                if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
-                originalWarn(...args);
-            };
-        </script>
 </body>
 
 </html>
